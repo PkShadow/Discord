@@ -1,42 +1,41 @@
 import requests
-from datetime import datetime
+from bs4 import BeautifulSoup
 
-# Replace this with the actual API endpoint or use web scraping
-API_URL = "https://zylalabs.com/api-marketplace/sports/live+basketball+api/1019"  # This is just an example URL; use the relevant API for Kaunas Žalgiris.
+# URL for Kaunas Žalgiris games on Euroleague
+url = "https://www.euroleaguebasketball.net/en/euroleague/teams/zalgiris-kaunas/games/zal/?season=2024-25"
 
-# Add your API Key (if the service requires it)
-API_KEY = "your_api_key"
-
-# Your Discord webhook URL (replace with your actual webhook URL)
+# Discord webhook URL (replace with your actual webhook URL)
 WEBHOOK_URL = "https://discord.com/api/webhooks/1318732693445410816/xFZbKLLOTfdq-iy_RUxlIRnwbew3uLd8atDZUAN2BrmkRL8mHkkCAQZtIB8b8uxvHzOt"
 
-headers = {
-    "User-Agent": "Mozilla/5.0",
-    "Authorization": f"Bearer {API_KEY}"
-}
-
-# Function to fetch upcoming games
-def fetch_upcoming_games():
-    response = requests.get(API_URL, headers=headers)
+# Function to fetch Kaunas Žalgiris game schedule
+def fetch_zalgiris_schedule():
+    # Send a GET request to the Euroleague page
+    response = requests.get(url)
 
     if response.status_code == 200:
-        games = response.json()  # Assuming the API returns JSON data with the schedule
-        upcoming_games = []
-        
-        # Iterate through games and filter for Kaunas Žalgiris games
-        for game in games:
-            if 'Kaunas' in game['teams']['home']['name'] or 'Kaunas' in game['teams']['away']['name']:
-                game_time = datetime.fromisoformat(game['date'])  # Adjust this based on API response structure
-                upcoming_games.append({
-                    "team_home": game['teams']['home']['name'],
-                    "team_away": game['teams']['away']['name'],
-                    "date_time": game_time.strftime("%Y-%m-%d %H:%M:%S"),
-                    "location": game['location']  # Adjust as per API response
-                })
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-        return upcoming_games
+        # Find the game schedule container in the page
+        games_section = soup.find_all('div', class_='event__data')
+
+        # Extract game details (date, opponent, and time)
+        games = []
+        for game in games_section:
+            date = game.find('span', class_='event__date')
+            time = game.find('span', class_='event__time')
+            opponent = game.find('span', class_='event__team-name')
+
+            if date and time and opponent:
+                game_details = {
+                    'date': date.text.strip(),
+                    'time': time.text.strip(),
+                    'opponent': opponent.text.strip()
+                }
+                games.append(game_details)
+
+        return games
     else:
-        print(f"Error fetching games: {response.status_code}")
+        print(f"Failed to retrieve data, status code: {response.status_code}")
         return []
 
 # Function to send message to Discord Webhook
@@ -44,22 +43,20 @@ def send_to_discord(games):
     for game in games:
         message = {
             "content": f"Upcoming Kaunas Žalgiris Game:\n"
-                       f"{game['team_home']} vs {game['team_away']}\n"
-                       f"Date: {game['date_time']}\n"
-                       f"Location: {game['location']}\n"
+                       f"Date: {game['date']} | Time: {game['time']} | Opponent: {game['opponent']}\n"
                        "----------------------------------"
         }
         # Send the message to the Discord webhook
         response = requests.post(WEBHOOK_URL, json=message)
 
         if response.status_code == 204:
-            print(f"Successfully sent game to Discord: {game['team_home']} vs {game['team_away']}")
+            print(f"Successfully sent game to Discord: {game['opponent']}")
         else:
             print(f"Failed to send game to Discord: {response.status_code}")
 
 # Main function to fetch and send upcoming games to Discord
 def main():
-    games = fetch_upcoming_games()
+    games = fetch_zalgiris_schedule()
 
     if games:
         send_to_discord(games)
