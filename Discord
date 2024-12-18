@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 
 # Replace this with the actual API endpoint or use web scraping
-API_URL = "https://www.flashscore.com/team/zalgiris-kaunas/6JbDYvUs/fixtures/"  # This is just an example URL; use the relevant API for Kaunas Žalgiris.
+API_URL = "https://zylalabs.com/api-marketplace/sports/live+basketball+api/1019"  # This is just an example URL; use the relevant API for Kaunas Žalgiris.
 
 # Add your API Key (if the service requires it)
 API_KEY = "your_api_key"
