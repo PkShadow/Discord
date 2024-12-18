@@ -8,7 +8,7 @@ API_URL = "https://api.sportsdata.io/v4/nba/schedules"  # This is just an exampl
 API_KEY = "your_api_key"
 
 # Your Discord webhook URL (replace with your actual webhook URL)
-WEBHOOK_URL = "https://discord.com/api/webhooks/your_webhook_url"
+WEBHOOK_URL = "https://discord.com/api/webhooks/1318732693445410816/xFZbKLLOTfdq-iy_RUxlIRnwbew3uLd8atDZUAN2BrmkRL8mHkkCAQZtIB8b8uxvHzOt"
 
 headers = {
     "User-Agent": "Mozilla/5.0",
