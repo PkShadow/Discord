@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+import schedule
+import time
 
 # URL for Kaunas Žalgiris games on Euroleague
 url = "https://www.euroleaguebasketball.net/en/euroleague/teams/zalgiris-kaunas/games/zal/?season=2024-25"
@@ -18,7 +20,6 @@ def fetch_zalgiris_schedule():
         # Find the game schedule container in the page
         games_section = soup.find_all('div', class_='event__data')
 
-        # Extract game details (date, opponent, and time)
         games = []
         for game in games_section:
             date = game.find('span', class_='event__date')
@@ -54,8 +55,8 @@ def send_to_discord(games):
         else:
             print(f"Failed to send game to Discord: {response.status_code}")
 
-# Main function to fetch and send upcoming games to Discord
-def main():
+# Function to fetch and send games to Discord
+def job():
     games = fetch_zalgiris_schedule()
 
     if games:
@@ -63,5 +64,10 @@ def main():
     else:
         print("No upcoming games found.")
 
-# Run the function
-main()
+# Schedule the job to run every hour
+schedule.every(1).hours.do(job)
+
+# Loop to run the schedule
+while True:
+    schedule.run_pending()  # Run all the scheduled jobs
+    time.sleep(60)  # Sleep for 1 minute to prevent high CPU usage
