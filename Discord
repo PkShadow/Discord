@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 
 # Replace this with the actual API endpoint or use web scraping
-API_URL = "https://api.sportsdata.io/v4/nba/schedules"  # This is just an example URL; use the relevant API for Kaunas Žalgiris.
+API_URL = "https://www.euroleaguebasketball.net/euroleague/teams/zalgiris-kaunas/games/zal/"  # This is just an example URL; use the relevant API for Kaunas Žalgiris.
 
 # Add your API Key (if the service requires it)
 API_KEY = "your_api_key"
